@@ -1,0 +1,56 @@
+
+name: Preparar PC virtual
+
+on:
+  workflow_dispatch:
+
+jobs:
+  preparar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Instalar herramientas de virtualizacion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qemu-system-x86 \
+            qemu-utils \
+            ovmf \
+            cpu-checker \
+            pciutils \
+            mesa-utils \
+            vulkan-tools \
+            p7zip-full \
+            unzip
+
+      - name: Comprobar hardware disponible
+        run: |
+          echo "=== PROCESADOR REAL ==="
+          lscpu
+          echo "=== MEMORIA REAL ==="
+          free -h
+          echo "=== ALMACENAMIENTO ==="
+          df -h
+          echo "=== GPU DISPONIBLE ==="
+          lspci | grep -Ei \
+            'vga|3d|display' || true
+          echo "=== VIRTUALIZACION ==="
+          kvm-ok || true
+
+      - name: Comprobar soporte de QEMU
+        run: |
+          qemu-system-x86_64 --version
+          qemu-img --version
+          echo "=== EFI ==="
+          ls /usr/share/OVMF/ || true
+
+      - name: Resumen
+        run: |
+          echo "Objetivo de la PC virtual:"
+          echo "Sistema: Windows 11 x64"
+          echo "CPU objetivo: Intel Core i5 11a generacion"
+          echo "RAM objetivo: 32 GB"
+          echo "GPU objetivo: NVIDIA RTX 3060"
+          echo "SSD virtual objetivo: 1 TB"
+          echo "La disponibilidad depende del servidor."
+          
